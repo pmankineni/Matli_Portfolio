@@ -7,3 +7,6 @@ source/
 
 .DS_Store
 *.log
+
+# Share bundles built for review. Regenerate from index.html any time.
+*.zip
