@@ -124,7 +124,7 @@ body {
    ============================================================ */
 .cover {
   max-width: 1320px; margin: 0 auto;
-  padding: clamp(46px, 8vh, 96px) clamp(16px, 3vw, 34px) clamp(30px, 5vh, 56px);
+  padding: clamp(28px, 5vh, 62px) clamp(16px, 3vw, 34px) clamp(10px, 1.6vh, 20px);
 }
 .eyebrow {
   margin: 0 0 14px; font-size: 11px; letter-spacing: .2em;
@@ -136,21 +136,23 @@ body {
   font-weight: 700; letter-spacing: -.028em; line-height: 1.02;
 }
 .cover-sub {
-  margin: 0 0 30px; font-size: clamp(14px, 1.7vw, 18px);
+  margin: 0 0 20px; font-size: clamp(14px, 1.7vw, 18px);
   color: var(--ink-soft); font-weight: 500;
 }
 .thesis {
   font-family: 'Caveat', cursive;
   font-size: clamp(25px, 3.7vw, 42px);
-  line-height: 1.26; color: var(--build);
-  /* 20ch orphaned "system." and "for it." onto lines of their own - on the one
-     sentence the whole page turns on. Wide enough for each clause to hold. */
-  margin: 0 0 8px; max-width: 34ch;
+  line-height: 1.22; color: var(--build);
+  /* One line, two inks: the sentence reads straight across and the colour
+     changes mid-way, which is the turn the whole page is about. flex-wrap
+     means it still stacks cleanly when the viewport cannot hold both. */
+  display: flex; flex-wrap: wrap; gap: 0 .5em;
+  margin: 0 0 6px;
 }
 .thesis .flip { color: var(--own); }
 .thesis-note {
-  margin: 0 0 40px; font-size: 13.5px; color: var(--ink-faint);
-  max-width: 54ch;
+  margin: 0 0 24px; font-size: 13.5px; color: var(--ink-faint);
+  max-width: 68ch;
 }
 
 .tiles {
@@ -174,7 +176,7 @@ body {
 }
 
 .scroll-cue {
-  margin-top: 46px; font-family: 'Caveat', cursive;
+  margin-top: 26px; font-family: 'Caveat', cursive;
   font-size: 20px; color: var(--ink-faint);
   display: flex; align-items: center; gap: 10px;
 }
@@ -191,7 +193,11 @@ body {
   position: sticky; top: var(--bar); z-index: 0;
   height: calc(100vh - var(--bar));
   display: grid; place-items: center;
-  padding: 10px clamp(10px, 2vw, 26px);
+  /* Bottom padding only, so the map sits ABOVE centre. Centred in the full
+     stage it left a screen's worth of blank between the cover and the map on
+     a tall window - and the map's 2.29:1 shape means no amount of width
+     closes that gap. The mobile rule below overrides this padding. */
+  padding: 0 clamp(10px, 2vw, 26px) 13vh;
   overflow: hidden;
 }
 .stage-inner {
@@ -201,7 +207,14 @@ body {
 /* Reserve the column the chapter cards live in. Without this the card
    sits on top of exactly the region it is talking about - the Asia
    Pacific chapter covered Asia Pacific. */
-@media (min-width: 1080px) { .stage-inner { padding-right: 466px; } }
+/* 430px card + 34px of .steps padding + 36px of actual gap. The old 466px
+   left exactly 2px between the map's right edge and the card - clear only by
+   luck, and it went negative the moment .steps changed width. */
+@media (min-width: 1080px) { .stage-inner { padding-right: 500px; } }
+/* On a big screen the 1320px cap left the map small in a lot of air.
+   .steps is widened to match, but that half has to live AFTER the base
+   .steps rule (below) - same specificity, so source order decides. */
+@media (min-width: 1500px) { .stage-inner { max-width: 1600px; } }
 
 /* The graticule spans +/-80 degrees while the viewBox hugs the land bounds, so
    it paints outside the box; overflow:visible let it bleed over the gauge and
@@ -322,6 +335,10 @@ body {
   padding: 0 clamp(16px, 3vw, 34px);
   pointer-events: none;
 }
+/* pairs with the .stage-inner widening above; must come after the .steps
+   rule it overrides */
+@media (min-width: 1500px) { .steps { max-width: 1600px; } }
+
 .step {
   min-height: 100vh;
   display: flex; align-items: center; justify-content: flex-end;
@@ -1233,8 +1250,8 @@ $('avatarSlot').innerHTML = '<div class="avatar-fb">' + esc(COVER.initials) + '<
 $('cvEyebrow').textContent = COVER.eyebrow;
 $('cvName').textContent = COVER.name;
 $('cvSub').textContent = COVER.sub;
-$('cvThesis').innerHTML = esc(COVER.thesis[0]) + '<br><span class="flip">'
-  + esc(COVER.thesis[1]) + '</span>';
+$('cvThesis').innerHTML = '<span>' + esc(COVER.thesis[0]) + '</span>'
+  + '<span class="flip">' + esc(COVER.thesis[1]) + '</span>';
 $('cvNote').textContent = COVER.note;
 $('cueText').textContent = COVER.cue;
 
