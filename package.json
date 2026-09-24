@@ -1,0 +1,16 @@
+{
+  "name": "sasidhar-matli-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Career portfolio for Sasidhar Reddy Matli - SAP O2C Process Expert",
+  "scripts": {
+    "map": "node tools/make-map.mjs",
+    "build": "node build.mjs"
+  },
+  "devDependencies": {
+    "d3-geo": "^3.1.1",
+    "topojson-client": "^3.1.0",
+    "world-atlas": "^2.0.2"
+  }
+}

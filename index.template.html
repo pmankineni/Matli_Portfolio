@@ -1,0 +1,1741 @@
+<style>
+/* ============================================================
+   THE ATLAS - Sasidhar Reddy Matli
+   ------------------------------------------------------------
+   Same paper and the same two-ink idea as the Mankineni brevet
+   book, so the two read as a pair. The spine is different on
+   purpose: his story is reach, not route, so the world map is
+   the structure and it inks itself in as you scroll.
+
+   Two inks carry the transformation:
+     BUILD ink (blue)  - what he wrote
+     OWN ink (green)   - what he became responsible for
+   The toolkit card tips from one to the other in front of you.
+   ============================================================ */
+
+@font-face {
+  font-family: 'Caveat';
+  src: url('{{FONT_CAVEAT}}') format('woff2');
+  font-weight: 400 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'InterVar';
+  src: url('{{FONT_INTER}}') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+:root {
+  /* paper */
+  --paper:      #faf6ec;
+  --paper-2:    #f4efe1;
+  --grid:       rgba(58, 74, 110, .055);
+  --grid-bold:  rgba(58, 74, 110, .085);
+
+  /* the three inks */
+  --build:      #2c5bd6;   /* what he wrote */
+  --own:        #16795c;   /* what he owns  */
+  --stamp:      #b4442f;   /* go-live stamps */
+  --pencil:     #6d6a5f;   /* unconfirmed, pending his timeline */
+
+  --ink:        #1c2430;
+  --ink-soft:   #4a5462;
+  --ink-faint:  #8a8778;
+
+  /* land */
+  --land:       #ece5d3;
+  --land-edge:  #d3c9ae;
+  --land-lit:   rgba(44, 91, 214, .15);
+
+  --bar:        76px;   /* sticky identity bar height */
+  --rule:       rgba(58, 74, 110, .18);
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  margin: 0;
+  background-color: var(--paper);
+  /* squared paper - two grids, the bolder one every 5th line */
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+    linear-gradient(var(--grid-bold) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-bold) 1px, transparent 1px);
+  background-size: 22px 22px, 22px 22px, 110px 110px, 110px 110px;
+  color: var(--ink);
+  font-family: 'InterVar', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+.hand { font-family: 'Caveat', 'Segoe Script', cursive; }
+
+/* ============================================================
+   STICKY IDENTITY BAR
+   ============================================================ */
+.topbar {
+  position: sticky; top: 0; z-index: 60;
+  height: var(--bar);
+  background: rgba(250, 246, 236, .93);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+}
+.topbar-inner {
+  max-width: 1320px; margin: 0 auto; height: 100%;
+  padding: 0 clamp(16px, 3vw, 34px);
+  display: flex; align-items: center; gap: 14px;
+}
+.avatar {
+  width: 46px; height: 46px; flex: none; border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid var(--build);
+  box-shadow: 0 0 0 3px var(--paper), 0 0 0 4.5px rgba(44, 91, 214, .2);
+}
+.avatar-fb {
+  width: 46px; height: 46px; flex: none; border-radius: 50%;
+  display: grid; place-items: center;
+  font-family: 'Caveat', cursive; font-size: 21px; font-weight: 700;
+  color: var(--build); background: var(--paper-2);
+  border: 1.5px solid var(--build);
+  box-shadow: 0 0 0 3px var(--paper), 0 0 0 4.5px rgba(44, 91, 214, .2);
+}
+.tb-role {
+  margin: 0; font-size: 10.5px; letter-spacing: .13em; text-transform: uppercase;
+  color: var(--ink-faint); font-weight: 600;
+}
+.tb-name { margin: 0; font-size: 17px; font-weight: 650; letter-spacing: -.01em; line-height: 1.2; }
+.tb-firm {
+  margin-left: auto; text-align: right; line-height: 1.25;
+}
+.tb-firm b { display: block; font-size: 14px; font-weight: 650; }
+.tb-firm span { font-size: 10.5px; color: var(--ink-faint); letter-spacing: .06em; text-transform: uppercase; }
+@media (max-width: 620px) { .tb-firm { display: none; } }
+
+/* ============================================================
+   COVER
+   ============================================================ */
+.cover {
+  max-width: 1320px; margin: 0 auto;
+  padding: clamp(46px, 8vh, 96px) clamp(16px, 3vw, 34px) clamp(30px, 5vh, 56px);
+}
+.eyebrow {
+  margin: 0 0 14px; font-size: 11px; letter-spacing: .2em;
+  text-transform: uppercase; color: var(--ink-faint); font-weight: 600;
+}
+.cover h1 {
+  margin: 0 0 6px;
+  font-size: clamp(34px, 6.4vw, 70px);
+  font-weight: 700; letter-spacing: -.028em; line-height: 1.02;
+}
+.cover-sub {
+  margin: 0 0 30px; font-size: clamp(14px, 1.7vw, 18px);
+  color: var(--ink-soft); font-weight: 500;
+}
+.thesis {
+  font-family: 'Caveat', cursive;
+  font-size: clamp(25px, 3.7vw, 42px);
+  line-height: 1.26; color: var(--build);
+  /* 20ch orphaned "system." and "for it." onto lines of their own - on the one
+     sentence the whole page turns on. Wide enough for each clause to hold. */
+  margin: 0 0 8px; max-width: 34ch;
+}
+.thesis .flip { color: var(--own); }
+.thesis-note {
+  margin: 0 0 40px; font-size: 13.5px; color: var(--ink-faint);
+  max-width: 54ch;
+}
+
+.tiles {
+  display: grid; gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+  max-width: 760px;
+}
+.tile {
+  border: 1px solid var(--rule); border-radius: 3px;
+  background: rgba(255, 255, 255, .42);
+  padding: 13px 15px 12px;
+}
+.tile b {
+  display: block; font-family: 'Caveat', cursive;
+  font-size: 40px; line-height: .95; color: var(--build); font-weight: 700;
+}
+.tile span {
+  display: block; margin-top: 5px; font-size: 10.5px;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--ink-faint); font-weight: 600;
+}
+
+.scroll-cue {
+  margin-top: 46px; font-family: 'Caveat', cursive;
+  font-size: 20px; color: var(--ink-faint);
+  display: flex; align-items: center; gap: 10px;
+}
+.scroll-cue svg { animation: bob 2.1s ease-in-out infinite; }
+@keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
+@media (prefers-reduced-motion: reduce) { .scroll-cue svg { animation: none; } }
+
+/* ============================================================
+   THE ATLAS - sticky map, chapters scrolling over it
+   ============================================================ */
+.atlas { position: relative; }
+
+.stage {
+  position: sticky; top: var(--bar); z-index: 0;
+  height: calc(100vh - var(--bar));
+  display: grid; place-items: center;
+  padding: 10px clamp(10px, 2vw, 26px);
+  overflow: hidden;
+}
+.stage-inner {
+  position: relative; width: 100%; max-width: 1320px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+/* Reserve the column the chapter cards live in. Without this the card
+   sits on top of exactly the region it is talking about - the Asia
+   Pacific chapter covered Asia Pacific. */
+@media (min-width: 1080px) { .stage-inner { padding-right: 466px; } }
+
+/* The graticule spans +/-80 degrees while the viewBox hugs the land bounds, so
+   it paints outside the box; overflow:visible let it bleed over the gauge and
+   the page margin. Clipped instead - nothing else draws outside the frame. */
+#map { display: block; width: 100%; height: auto; overflow: hidden; }
+
+/* unvisited land recedes into the paper */
+.c-land { fill: var(--land); stroke: var(--land-edge); stroke-width: .55; vector-effect: non-scaling-stroke; }
+
+/* A country he has worked in. Deliberately ONE styling, with no
+   "unconfirmed" variant: the country list is real - it comes straight
+   off his own deck - and only which YEAR each one landed in is still
+   open. Dimming the country to say that made 29 of 31 countries
+   invisible and quietly undercut the headline number. The uncertainty
+   belongs on the pin and on the card, not on the geography. */
+/* WHERE HE LIVED. A separate layer from the blue, because the roadmap
+   column that drives the blue is headed "Major Country PROJECTS
+   Supported" - it is not a record of residence. Conflating the two left
+   India blank for the eight years he worked there and Germany blank for
+   fourteen. Pencil, not a fourth hue: the palette stays at three inks. */
+.c-land.home {
+  fill: rgba(109, 106, 95, .17); stroke: var(--pencil);
+  stroke-width: .9; stroke-dasharray: 3.5 2.5;
+}
+/* declared after .home so a country that is both reads as blue */
+.c-land.lit { fill: var(--land-lit); stroke: var(--build); stroke-width: 1; stroke-dasharray: none; }
+
+/* the second, offset pass - reads as a pen gone over the line twice.
+   The geometry itself is never distorted: Natural Earth coastlines are
+   already irregular, and nudging them just makes Italy stop looking
+   like Italy. The hand comes from the stroke and the furniture. */
+.c-trace {
+  fill: none; stroke: var(--build); stroke-width: .8; stroke-linejoin: round;
+  opacity: 0; transform: translate(.7px, .6px);
+  vector-effect: non-scaling-stroke;
+  transition: opacity .8s ease;
+}
+.c-trace.on { opacity: .34; }
+
+.graticule {
+  fill: none; stroke: rgba(58, 74, 110, .13); stroke-width: .4;
+  stroke-dasharray: 1.6 3.4; vector-effect: non-scaling-stroke;
+}
+
+/* --- city pins --- */
+.pin { opacity: 0; transition: opacity .5s ease; }
+.pin.on { opacity: 1; }
+.pin-dot { fill: var(--stamp); }
+.pin-ring {
+  fill: none; stroke: var(--stamp); stroke-width: 1.1;
+  vector-effect: non-scaling-stroke; opacity: .55;
+}
+.pin.pend .pin-dot { fill: var(--pencil); }
+.pin.pend .pin-ring { stroke: var(--pencil); stroke-dasharray: 2 2; }
+.pin-label {
+  font-family: 'Caveat', cursive; font-size: 13px; font-weight: 600;
+  fill: var(--ink); paint-order: stroke;
+  stroke: var(--paper); stroke-width: 3px; stroke-linejoin: round;
+}
+.pin.pend .pin-label { fill: var(--pencil); }
+/* micro-states (SG, HK) have no outline at this map scale - a filled
+   disc is the honest rendering for a city-state anyway */
+.micro { fill: var(--build); opacity: 0; transition: opacity .6s ease; }
+.micro.on { opacity: .85; }
+
+/* --- relocation arcs between home towns --- */
+.arc {
+  fill: none; stroke: var(--pencil); stroke-width: 1.1;
+  stroke-linecap: round; vector-effect: non-scaling-stroke;
+  opacity: 0; transition: opacity .7s ease;
+}
+.arc.on { opacity: .5; }
+
+/* --- home-town pins: square and inked, so they never read as a site --- */
+.base-box {
+  fill: var(--paper); stroke: var(--ink); stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
+}
+.base-label { fill: var(--ink); font-weight: 700; }
+
+/* --- the gauge: countries reached ---
+   One block, not two. The number and the era it belongs to were
+   originally at opposite corners of the map and read as unrelated
+   furniture; together, on a paper chip, they read as a caption.
+   The chip is what lets it stay legible over land. */
+.gauge {
+  /* In normal flow ABOVE the map rather than floated over it. Absolutely
+     positioned it landed on Canada, and there is no corner of a world map
+     that stays empty for all five chapters. */
+  align-self: flex-start; order: -1;
+  display: flex; align-items: center; gap: 11px;
+  padding: 9px 15px 9px 13px;
+  background: rgba(250, 246, 236, .82);
+  backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+  border: 1px solid var(--rule); border-radius: 2px;
+  pointer-events: none;
+}
+.gauge b {
+  font-family: 'Caveat', cursive; font-size: clamp(42px, 5vw, 62px);
+  font-weight: 700; color: var(--build); line-height: .82;
+  font-variant-numeric: tabular-nums; text-align: right;
+}
+.gauge-lbl {
+  display: block; font-size: 10px; letter-spacing: .13em;
+  text-transform: uppercase; color: var(--ink-faint); font-weight: 700;
+  line-height: 1.35;
+}
+.gauge-era {
+  display: block; font-family: 'Caveat', cursive; font-size: 21px;
+  color: var(--ink-soft); line-height: 1.15; margin-top: 1px;
+}
+
+/* --- the chapters, floating over the map --- */
+.steps {
+  position: relative; z-index: 2;
+  margin-top: calc(-100vh + var(--bar));
+  max-width: 1320px; margin-left: auto; margin-right: auto;
+  padding: 0 clamp(16px, 3vw, 34px);
+  pointer-events: none;
+}
+.step {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: flex-end;
+  padding: 8vh 0;
+}
+.step:first-child { padding-top: 46vh; }
+.step:last-child  { padding-bottom: 40vh; }
+
+.card {
+  pointer-events: auto;
+  width: min(430px, 100%);
+  background: rgba(250, 246, 236, .95);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--build);
+  border-radius: 2px;
+  padding: 22px 24px 20px;
+  box-shadow: 0 10px 34px -16px rgba(28, 36, 48, .4);
+  opacity: 0; transform: translateY(22px);
+  transition: opacity .6s ease, transform .6s ease;
+}
+.card.in { opacity: 1; transform: none; }
+.card.own-era { border-left-color: var(--own); }
+@media (prefers-reduced-motion: reduce) {
+  .card { transition: none; opacity: 1; transform: none; }
+}
+
+.c-years {
+  font-family: 'Caveat', cursive; font-size: 27px; font-weight: 700;
+  color: var(--build); line-height: 1; margin: 0 0 3px;
+}
+.card.own-era .c-years { color: var(--own); }
+.c-role { margin: 0 0 2px; font-size: 13.5px; font-weight: 600; color: var(--ink-soft); }
+.c-org {
+  margin: 0 0 13px; font-size: 11px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--ink-faint); font-weight: 600;
+}
+.c-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 3px; }
+.entity {
+  margin-left: auto; font-size: 9.5px; font-weight: 700; letter-spacing: .12em;
+  padding: 2px 7px; border-radius: 2px; border: 1px solid var(--rule);
+  color: var(--ink-faint); background: rgba(255, 255, 255, .5);
+}
+.card.own-era .entity { color: var(--own); border-color: rgba(22, 121, 92, .4); }
+.c-title {
+  margin: 0 0 3px; font-size: 21px; font-weight: 700; letter-spacing: -.016em;
+  line-height: 1.15;
+}
+.card.hinge { border-left-width: 5px; }
+.card.hinge .c-title { color: var(--own); }
+
+.c-acts { margin: 0 0 14px; padding: 0; list-style: none; }
+.c-acts li {
+  position: relative; padding-left: 16px; margin-bottom: 5px;
+  font-size: 13.5px; color: var(--ink-soft); line-height: 1.5;
+}
+.c-acts li::before {
+  content: ''; position: absolute; left: 0; top: .62em;
+  width: 6px; height: 1.5px; background: var(--ink-faint);
+}
+
+/* the mix bar - how much of this era was building vs owning */
+.mix { display: flex; height: 5px; border-radius: 3px; overflow: hidden; margin-bottom: 11px; }
+.mix i { display: block; height: 100%; transition: width .7s ease; }
+.mix .mb { background: var(--build); }
+.mix .mo { background: var(--own); }
+.mix-key {
+  display: flex; gap: 14px; font-size: 10px; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--ink-faint); font-weight: 600;
+  margin: -6px 0 13px;
+}
+.mix-key i { font-style: normal; }
+.mix-key .kb::before, .mix-key .ko::before {
+  content: ''; display: inline-block; width: 7px; height: 7px;
+  border-radius: 2px; margin-right: 5px; vertical-align: 0;
+}
+.mix-key .kb::before { background: var(--build); }
+.mix-key .ko::before { background: var(--own); }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  font-size: 11.5px; font-weight: 600; padding: 3px 9px;
+  border-radius: 2px; border: 1px solid;
+  letter-spacing: .01em;
+}
+.chip.build { color: var(--build); border-color: rgba(44, 91, 214, .42); background: rgba(44, 91, 214, .07); }
+.chip.own   { color: var(--own);   border-color: rgba(22, 121, 92, .45); background: rgba(22, 121, 92, .08); }
+
+/* the dated deliverables off his own 2016 roadmap deck */
+.shipped { margin: 13px 0 0; font-size: 11.5px; line-height: 1.9; }
+.shipped > b {
+  display: block; font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--ink-faint); font-weight: 700; margin-bottom: 5px;
+}
+.ship {
+  display: inline-block; margin: 0 5px 0 0; padding: 2px 8px;
+  border: 1px solid rgba(44, 91, 214, .34); border-radius: 2px;
+  color: var(--build); background: rgba(44, 91, 214, .06); font-weight: 600;
+}
+.ship em { font-style: normal; color: var(--ink-faint); font-weight: 600; }
+
+/* the year-by-year go-live lines, straight off the roadmap */
+.yearlines { margin: 13px 0 0; padding: 11px 0 0; list-style: none; border-top: 1px dashed var(--rule); }
+.yearlines li { display: flex; gap: 10px; font-size: 12.5px; margin-bottom: 4px; line-height: 1.45; }
+.yearlines b {
+  flex: none; width: 62px; font-family: 'Caveat', cursive; font-size: 17px;
+  font-weight: 700; color: var(--build); line-height: 1.3;
+}
+.card.own-era .yearlines b { color: var(--own); }
+.yearlines span { color: var(--ink-soft); }
+
+.c-move {
+  margin: 12px 0 0; padding-top: 11px; border-top: 1px dashed var(--rule);
+  font-family: 'Caveat', cursive; font-size: 17px; color: var(--ink-soft); line-height: 1.35;
+}
+.c-move em { font-style: normal; color: var(--ink-faint); }
+
+/* the R/3 -> S/4 comparison */
+/* .panel .big is defined later in the file at the same specificity, so
+   these need the extra class to win: 2006 in build ink, 2023 in own ink -
+   the two sides of the page's whole argument. */
+.panel.pf .big { color: var(--build); }
+.panel.pf-now .big { color: var(--own); }
+.pf-list { margin: 9px 0 0; padding: 0; list-style: none; }
+.pf-list li {
+  font-size: 13px; color: var(--ink-soft); padding: 3px 0;
+  border-bottom: 1px dashed rgba(58, 74, 110, .12);
+}
+.pf-list li.gone {
+  color: var(--stamp); text-decoration: line-through;
+  text-decoration-color: rgba(180, 68, 47, .5);
+}
+.pf-note { margin: 18px 0 0; font-size: 21px; color: var(--stamp); }
+
+.c-where {
+  margin: 14px 0 0; padding-top: 12px; border-top: 1px dashed var(--rule);
+  font-size: 12px; color: var(--ink-faint); line-height: 1.5;
+}
+.c-where b { color: var(--ink-soft); font-weight: 650; }
+
+/* ============================================================
+   TOOLKIT - the two-ink card
+   ============================================================ */
+.toolkit {
+  position: fixed; left: clamp(12px, 2vw, 24px); bottom: clamp(12px, 2vw, 22px);
+  z-index: 40; width: 208px;
+  background: rgba(250, 246, 236, .96);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  border: 1px solid var(--rule); border-radius: 2px;
+  padding: 12px 13px 10px;
+  box-shadow: 0 10px 30px -14px rgba(28, 36, 48, .42);
+  opacity: 0; transform: translateY(12px);
+  transition: opacity .5s ease, transform .5s ease;
+}
+.toolkit.show { opacity: 1; transform: none; }
+.tk-head {
+  font-family: 'Caveat', cursive; font-size: 20px; font-weight: 700;
+  color: var(--ink); margin: 0 0 8px; line-height: 1;
+}
+.tk-group { margin-bottom: 9px; }
+.tk-group.empty { display: none; }
+.tk-label {
+  font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase;
+  font-weight: 700; margin-bottom: 5px;
+}
+.tk-group.b .tk-label { color: var(--build); }
+.tk-group.o .tk-label { color: var(--own); }
+.tk-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px; }
+.tk-list li {
+  font-size: 10.5px; font-weight: 600; padding: 2px 7px; border-radius: 2px;
+  border: 1px solid; opacity: 0; transform: translateY(-4px);
+  transition: opacity .45s ease, transform .45s ease;
+}
+.tk-list li.in { opacity: 1; transform: none; }
+.tk-group.b li { color: var(--build); border-color: rgba(44, 91, 214, .4); background: rgba(44, 91, 214, .07); }
+.tk-group.o li { color: var(--own);   border-color: rgba(22, 121, 92, .42); background: rgba(22, 121, 92, .08); }
+.tk-tip {
+  margin: 8px 0 0; padding-top: 8px; border-top: 1px dashed var(--rule);
+  font-family: 'Caveat', cursive; font-size: 14px; color: var(--ink-faint); line-height: 1.25;
+}
+.tk-bar { display: flex; height: 4px; border-radius: 2px; overflow: hidden; margin-top: 7px; }
+.tk-bar i { display: block; height: 100%; transition: width .6s ease; }
+.tk-bar .mb { background: var(--build); }
+.tk-bar .mo { background: var(--own); }
+
+/* ------------------------------------------------------------
+   NARROW SCREENS - stack instead of overlay.
+   Overlaying a near-opaque card on a 368px-wide map hid the map
+   completely, which removes the entire point of the page on a
+   phone. So below 1080px the map pins to the top of the viewport
+   at reduced height and the chapters scroll UNDERNEATH it: the
+   stage gets an opaque background and a higher z-index, which is
+   what makes the cards slide behind rather than over it.
+   ------------------------------------------------------------ */
+@media (max-width: 1080px) {
+  .stage {
+    height: 34vh; min-height: 200px; z-index: 5;
+    background: var(--paper);
+    border-bottom: 1px solid var(--rule);
+    padding: 8px clamp(10px, 3vw, 20px);
+  }
+  .steps { margin-top: 0; z-index: 1; }
+  .step {
+    min-height: 74vh; display: block;
+    padding: 5vh 0;
+  }
+  .step:first-child { padding-top: 5vh; }
+  .step:last-child  { padding-bottom: 22vh; }
+  .card { width: 100%; }
+  .gauge { padding: 6px 12px 6px 10px; gap: 9px; }
+  .gauge b { font-size: 34px; }
+  .gauge-era { font-size: 17px; }
+  /* A 366px-wide map cannot carry eighteen city labels at any type size
+     that is still readable - scaled to fit they come out around 6px.
+     The dots and the inked countries carry reach here, and every city is
+     named in full under "Where the work happened". */
+  .pin-label { display: none; }
+}
+
+/* The fixed toolkit needs ~232px of gutter on the LEFT while the chapter
+   column already takes 466px on the right. Below ~1400px there is no room for
+   both and the card sat on top of North and South America, hiding lit
+   countries and three pins. Above it, both fit clear of the land. */
+@media (max-width: 1400px) { .toolkit { display: none; } }
+
+/* the same content, as a normal section, wherever the fixed card is hidden */
+.toolkit-static { display: none; }
+@media (max-width: 1400px) { .toolkit-static { display: block; } }
+
+/* ============================================================
+   SECTIONS AFTER THE MAP
+   ============================================================ */
+.section {
+  max-width: 1320px; margin: 0 auto;
+  padding: clamp(46px, 8vh, 88px) clamp(16px, 3vw, 34px);
+  position: relative; z-index: 3;
+  background: var(--paper);
+}
+.section h2 {
+  font-family: 'Caveat', cursive; font-size: clamp(30px, 4vw, 44px);
+  font-weight: 700; margin: 0 0 6px; color: var(--ink);
+}
+.section .lede { margin: 0 0 30px; color: var(--ink-soft); max-width: 62ch; font-size: 15px; }
+
+.grid3 { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+.panel {
+  border: 1px solid var(--rule); border-radius: 2px;
+  background: rgba(255, 255, 255, .42); padding: 17px 19px;
+}
+.panel h3 {
+  margin: 0 0 4px; font-size: 11px; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--ink-faint); font-weight: 700;
+}
+.panel .big { font-family: 'Caveat', cursive; font-size: 31px; color: var(--build); line-height: 1.05; font-weight: 700; }
+.panel p { margin: 6px 0 0; font-size: 13.5px; color: var(--ink-soft); line-height: 1.55; }
+.cc-list { margin: 9px 0 0; font-size: 12px; color: var(--ink-faint); letter-spacing: .06em; line-height: 1.7; }
+.cc-cities {
+  margin: 9px 0 0; padding-top: 9px; border-top: 1px dashed var(--rule);
+  font-size: 12px; color: var(--ink-faint); line-height: 1.6;
+}
+.cc-cities b { color: var(--ink-soft); font-weight: 650; }
+
+.topics { display: flex; flex-wrap: wrap; gap: 7px; }
+.topic {
+  font-size: 12.5px; font-weight: 600; padding: 5px 11px;
+  border: 1px solid rgba(22, 121, 92, .38); border-radius: 2px;
+  color: var(--own); background: rgba(22, 121, 92, .06);
+}
+
+.person { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+.p-item { border-left: 2px solid var(--rule); padding-left: 13px; }
+.p-item b { display: block; font-size: 10.5px; letter-spacing: .11em; text-transform: uppercase; color: var(--ink-faint); font-weight: 700; margin-bottom: 3px; }
+.p-item span { font-size: 14px; color: var(--ink); }
+
+/* ============================================================
+   CLOSING
+   ============================================================ */
+.closing {
+  max-width: 1320px; margin: 0 auto;
+  padding: clamp(50px, 9vh, 100px) clamp(16px, 3vw, 34px) clamp(60px, 10vh, 110px);
+  border-top: 1px solid var(--rule);
+  position: relative; z-index: 3; background: var(--paper);
+}
+.cl-line {
+  font-family: 'Caveat', cursive; font-size: clamp(27px, 4.2vw, 46px);
+  color: var(--own); margin: 0 0 14px; max-width: 24ch; line-height: 1.22;
+}
+.cl-note { margin: 0 0 26px; font-size: 13.5px; color: var(--ink-faint); max-width: 60ch; line-height: 1.6; }
+.cl-contact { display: flex; flex-wrap: wrap; gap: 8px 22px; align-items: center; font-size: 13.5px; }
+.cl-contact a { color: var(--build); text-decoration: none; border-bottom: 1px solid rgba(44, 91, 214, .3); }
+.cl-contact a:hover { border-bottom-color: var(--build); }
+.legend {
+  margin-top: 32px; padding-top: 18px; border-top: 1px dashed var(--rule);
+  display: flex; flex-wrap: wrap; gap: 8px 20px;
+  font-size: 11px; letter-spacing: .06em; color: var(--ink-faint);
+}
+.legend i { font-style: normal; display: inline-flex; align-items: center; gap: 6px; }
+.legend i::before { content: ''; width: 9px; height: 9px; border-radius: 2px; }
+.legend .lb::before { background: var(--build); }
+.legend .lo::before { background: var(--own); }
+.legend .ls::before { background: var(--stamp); }
+.legend .lp::before { background: var(--pencil); }
+
+/* ============================================================
+   PRINT - one flat document, no sticky anything
+   ============================================================ */
+@media print {
+  .toolkit, .scroll-cue { display: none !important; }
+  .topbar { position: static; }
+  .stage { position: static; height: auto; page-break-after: always; }
+  .steps { margin-top: 0; }
+  .step { min-height: 0; display: block; padding: 0 0 18px; page-break-inside: avoid; }
+  .card { opacity: 1; transform: none; width: 100%; box-shadow: none; }
+  body { background-image: none; }
+}
+</style>
+
+<!-- ==================== IDENTITY BAR ==================== -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <div id="avatarSlot"></div>
+    <div>
+      <p class="tb-role" id="tbRole"></p>
+      <p class="tb-name" id="tbName"></p>
+    </div>
+    <div class="tb-firm" id="tbFirm"></div>
+  </div>
+</header>
+
+<!-- ==================== COVER ==================== -->
+<section class="cover">
+  <p class="eyebrow" id="cvEyebrow"></p>
+  <h1 id="cvName"></h1>
+  <p class="cover-sub" id="cvSub"></p>
+  <p class="thesis" id="cvThesis"></p>
+  <p class="thesis-note" id="cvNote"></p>
+  <div class="tiles" id="tiles"></div>
+  <div class="scroll-cue">
+    <svg width="15" height="22" viewBox="0 0 15 22" fill="none" aria-hidden="true">
+      <path d="M7.5 1v19M2 14.5l5.5 5.5L13 14.5" stroke="currentColor" stroke-width="1.4"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span id="cueText"></span>
+  </div>
+</section>
+
+<!-- ==================== THE ATLAS ==================== -->
+<section class="atlas" id="atlas">
+  <div class="stage">
+    <div class="stage-inner">
+      <svg id="map" role="img"
+           aria-label="A world map on squared paper. Countries ink in as the career timeline advances, with a stamped pin dropped on each city worked in.">
+      </svg>
+      <div class="gauge">
+        <b id="gaugeNum">0</b>
+        <div>
+          <span class="gauge-lbl" id="gaugeLbl">countries supported</span>
+          <span class="gauge-era" id="gaugeEra"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="steps" id="steps"></div>
+</section>
+
+<!-- ==================== TOOLKIT (fixed) ==================== -->
+<aside class="toolkit" id="toolkit" aria-label="Toolkit, filling as the story advances">
+  <p class="tk-head" id="tkHead"></p>
+  <div class="tk-group b empty">
+    <div class="tk-label" id="tkLabelB"></div>
+    <ul class="tk-list" id="tkListB"></ul>
+  </div>
+  <div class="tk-group o empty">
+    <div class="tk-label" id="tkLabelO"></div>
+    <ul class="tk-list" id="tkListO"></ul>
+  </div>
+  <div class="tk-bar"><i class="mb" id="tkBarB"></i><i class="mo" id="tkBarO"></i></div>
+  <p class="tk-tip" id="tkTip"></p>
+</aside>
+
+<!-- ==================== AFTER THE MAP ==================== -->
+<section class="section" id="secFootprint">
+  <h2 id="fpTitle"></h2>
+  <p class="lede" id="fpLede"></p>
+  <div class="grid3" id="fpGrid"></div>
+</section>
+
+<section class="section" id="secPlatform">
+  <h2 id="pfTitle"></h2>
+  <p class="lede" id="pfLede"></p>
+  <div class="grid3" id="pfGrid"></div>
+  <p class="pf-note hand" id="pfNote"></p>
+</section>
+
+<section class="section" id="secToday">
+  <h2 id="tdTitle"></h2>
+  <p class="lede" id="tdLede"></p>
+  <div class="grid3" id="tdGrid"></div>
+  <h3 style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);font-weight:700;margin:30px 0 11px">
+    <span id="tdTopicsLbl"></span>
+  </h3>
+  <div class="topics" id="tdTopics"></div>
+</section>
+
+<!-- the toolkit again, as a normal block, for narrow screens -->
+<section class="section toolkit-static" id="secKit">
+  <h2 id="kitTitle"></h2>
+  <p class="lede" id="kitLede"></p>
+  <div class="grid3">
+    <div class="panel">
+      <h3 id="kitBLabel"></h3>
+      <div class="chips" id="kitBChips"></div>
+    </div>
+    <div class="panel">
+      <h3 id="kitOLabel"></h3>
+      <div class="chips" id="kitOChips"></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="secPerson">
+  <h2 id="pTitle"></h2>
+  <div class="person" id="pGrid"></div>
+</section>
+
+<!-- ==================== CLOSING ==================== -->
+<footer class="closing">
+  <p class="cl-line" id="clLine"></p>
+  <p class="cl-note" id="clNote"></p>
+  <div class="cl-contact" id="clContact"></div>
+  <div class="legend">
+    <i class="lb" id="lgB"></i>
+    <i class="lo" id="lgO"></i>
+    <i class="ls" id="lgS"></i>
+    <i class="lp" id="lgP"></i>
+  </div>
+</footer>
+
+<script>
+(function () {
+'use strict';
+
+/* ============================================================
+   1. THE CONTENT.  Everything worth editing lives here.
+   ------------------------------------------------------------
+   A toolkit entry is [name, 'build'] or [name, 'own'].
+     build -> blue.  Something he wrote or configured.
+     own   -> green. Something he became accountable for.
+   The toolkit card, the per-era mix bar and the legend all read
+   from that one flag, so flipping it moves every one of them.
+
+   ============================================================ */
+
+/* As-of date for the two tenure figures on the cover. One constant, so
+   the arithmetic below can never quietly drift out of date; bump it when
+   the page is next revised and the numbers follow. */
+var AS_OF = { year: 2026, month: 9 };
+var JOINED = { year: 2006, month: 12 };   /* "Developer - Dec 2006", his own roadmap deck */
+var CROSSED = { year: 2016, month: 12 };  /* BGSW -> PTDE, the row the whole page turns on */
+
+var COVER = {
+  eyebrow: null,   /* derived from AS_OF below */
+  name:    'Sasidhar Reddy Matli',
+  role:    'O2C Process Expert',
+  sub:     'Bosch Home Comfort · Wernau, Germany',
+  firm:    'Bosch',
+  firmRole:'Home Comfort',
+  initials:'SM',
+  /* Ten and nine, not ten and ten: Dec 2006 to Dec 2016 is exactly ten
+     years, and Dec 2016 to now is nine years and nine months. Rounding
+     the second one up would inflate the half of his career this page is
+     actually arguing for, in front of readers who know the dates. */
+  thesis:  null,   /* derived from AS_OF / JOINED / CROSSED below */
+  note:    null,   /* derived below - it quotes counts that must not be typed */
+  cue:     'scroll — the map fills as he goes'
+};
+
+/* Every number here is DERIVED from the timeline below, never typed.
+   The country tile and the counter beside the map read the same array,
+   so the headline and the map cannot disagree. */
+var TILES = [
+  { n: null, label: 'Years at Bosch',      derive: 'years' },
+  { n: null, label: 'Countries supported', derive: 'countries' },
+  { n: null, label: 'Bosch entities',      derive: 'entities' },
+  { n: null, label: 'Home towns',          derive: 'bases' }
+];
+
+/* ------------------------------------------------------------------
+   THE TIMELINE.  Straight from Roadmap_Overview.xlsx, his own
+   year-by-year record.
+
+   Two country layers, deliberately kept apart:
+     base      - where he was LIVING and working. Inks in pencil.
+     countries - the spreadsheet's "Major Country Projects Supported".
+                 Inks in blue, and this is what the counter counts.
+   Conflating them was the first draft's worst bug: the column is about
+   projects, not residence, so India stayed blank paper for the eight
+   years he worked there and Germany for the fourteen he has lived in it.
+
+   milestones - the nine dated flags on his 2016 roadmap deck. They are
+   in the slide's IMAGES, not its text, which is why a text extract
+   misses them. They are the only named deliverables in any source.
+   ------------------------------------------------------------------ */
+var CHAPTERS = [
+  {
+    display: '2006 — 2009', y0: 2006, y1: 2009,
+    title: 'On the build side',
+    role:  'Associate Software Engineer → Software Engineer',
+    entity:'BGSW',
+    org:   'ABAP development · Bengaluru, then Coimbatore',
+    acts: ['ABAP for Sales & Distribution, Material Management, and Finance & Controlling',
+           'R/3: developments, rollouts, process management, maintenance and support',
+           'Seven months in Bengaluru, then Coimbatore'],
+    learns: [['ABAP', 'build'], ['SAP R/3', 'build'], ['SD · MM · FI/CO', 'build']],
+    milestones: [['Developer', 'Dec 2006']],
+    base: ['IN'],
+    countries: [],
+    years: [],
+    move: { from: 'Bengaluru', to: 'Coimbatore', year: '2007',
+            line: 'Seven months in, he moved down to Coimbatore — home for most of the next seven years.' }
+  },
+  {
+    display: '2010 — 2011', y0: 2010, y1: 2011,
+    title: 'Sent to Germany',
+    role:  'Onsite Coordinator · SD Techno-Functional Consultant · Team Leader',
+    entity:'BGSW',
+    org:   'First short-term assignment · Leinfelden',
+    acts: ['First short-term assignment to Germany',
+           'Onsite coordinator between Leinfelden and the offshore team',
+           'DevCon – Forms; first time leading a team',
+           'The first six countries land in two years'],
+    learns: [['DevCon · Forms', 'build'], ['Onsite coordination', 'own'], ['Team lead', 'own']],
+    milestones: [['Onsite Coordinator', '2010'], ['Forms & Reprint', '2011']],
+    base: ['DE'],
+    countries: ['RU', 'UA', 'RO', 'BG', 'AU', 'NZ'],
+    years: [['2010', ['RU', 'UA', 'RO', 'BG']], ['2011', ['AU', 'NZ']]],
+    move: { from: 'Coimbatore', to: 'Leinfelden', year: '2010',
+            line: 'Sent to the Leinfelden office near Stuttgart, on assignment.' }
+  },
+  {
+    display: '2012 — Oct 2014', y0: 2012, y1: 2014,
+    title: 'Back to Coimbatore',
+    role:  'Specialist · SD Techno-Functional Consultant · Team Leader',
+    entity:'BGSW',
+    org:   'Assignment over · Coimbatore',
+    acts: ['The assignment ended and he went back to Coimbatore for three years',
+           'Software Engineer → Specialist',
+           'Architect from 2013',
+           'DevCon – Forms, and the SD techno-functional work'],
+    learns: [['Architect', 'build']],
+    milestones: [['Architect', '2013'], ['Invoicing', '2014'], ['eShop', '2014']],
+    base: ['IN'],
+    countries: ['AE', 'MA', 'TR'],
+    years: [['2012', ['AE', 'MA']], ['2013', ['TR']]],
+    move: { from: 'Leinfelden', to: 'Coimbatore', year: '2012', back: true,
+            line: 'Assignment finished. Back to Coimbatore.' }
+  },
+  {
+    display: 'Nov 2014 — Nov 2016', y0: 2014, y1: 2016,
+    title: 'The last build years',
+    role:  'SD Techno-Functional Consultant · Team Leader',
+    entity:'BGSW',
+    org:   'Second assignment · Leinfelden from 2015',
+    acts: ['A second assignment to Germany, agreed in November 2014',
+           'Based in Leinfelden from 2015 — and this one never reversed',
+           'Order management, migration management, enhanced ATP',
+           'The last stretch with his hands on the system'],
+    learns: [],
+    milestones: [['Order Mgmt.', '2015'], ['Migration Mgmt.', '2015'], ['Enhanced ATP', '2015']],
+    base: ['DE'],
+    countries: ['IN', 'JP'],
+    years: [['2014', ['IN']], ['2015', ['JP']]],
+    move: { from: 'Coimbatore', to: 'Leinfelden', year: '2015',
+            line: 'Back to Germany. He has not moved country since.' }
+  },
+  {
+    display: 'Dec 2016 — 2019', y0: 2016, y1: 2019,
+    title: 'Same city, other side',
+    role:  'Process Owner — Order-to-Cash',
+    entity:'PTDE',
+    org:   'Power Tools · incl. eCommerce',
+    acts: ['Same desk, same town, different company: BGSW → Power Tools',
+           'Process Owner for Order-to-Cash, including eCommerce',
+           'KPI ownership',
+           'Ten countries across Asia Pacific in three years'],
+    learns: [['Order-to-Cash', 'own'], ['eCommerce', 'own'], ['KPI ownership', 'own']],
+    milestones: [],
+    base: ['DE'],
+    countries: ['CN', 'HK', 'SG', 'MY', 'TH', 'VN', 'ID', 'PH', 'TW', 'KR'],
+    years: [['2017', ['CN', 'HK']],
+            ['2018', ['SG', 'MY', 'TH', 'VN', 'ID', 'PH', 'TW']],
+            ['2019', ['KR']]],
+    hinge: true,
+    move: null
+  },
+  {
+    display: '2020 — May 2024', y0: 2020, y1: 2024,
+    title: 'Three processes, one owner',
+    role:  'Process Owner — Source-to-Pay and Intralogistics-to-Demand',
+    entity:'PTDE',
+    org:   'Power Tools · three end-to-end processes at once',
+    acts: ['Source-to-Pay added, alongside Order-to-Cash',
+           'Intralogistics-to-Demand: logistics execution and warehouse interfaces',
+           'Three end-to-end processes on his name across these years',
+           'S/4HANA from 2023'],
+    learns: [['Source-to-Pay', 'own'], ['Intralogistics-to-Demand', 'own'], ['S/4HANA', 'build']],
+    milestones: [],
+    base: ['DE'],
+    countries: ['US', 'CA', 'HU', 'CZ', 'PL', 'SK'],
+    years: [['2020', ['US']], ['2021', ['CA']], ['2022', ['HU']], ['2023', ['CZ']],
+            ['2024 May', ['PL', 'CZ', 'SK']]],
+    move: null
+  },
+  {
+    display: 'Jun 2024 — today', y0: 2024, y1: 2026,
+    title: 'A new division, and people again',
+    role:  'Process Expert — Order-to-Cash',
+    entity:'HCDE',
+    org:   'Home Comfort · HC/BDO1-S2 · Wernau',
+    acts: ['Moved to Home Comfort — and eighteen kilometres up the road, to Wernau',
+           'Process Expert for Order-to-Cash',
+           'Work Stream Lead for O2C projects, from May 2025',
+           'Team coordinator for the contracted partner team, from June 2025 — '
+             + 'people back on his plate after nine years'],
+    learns: [['Work stream lead', 'own'], ['Team coordination', 'own'], ['Hiring', 'own']],
+    milestones: [],
+    base: ['DE'],
+    countries: ['DE', 'ES', 'PT', 'HR', 'RS', 'CL', 'CO'],
+    years: [['2024 Jun', ['DE', 'ES', 'PT']],
+            ['2025 Jun', ['BG', 'HR', 'HU', 'RO', 'RS', 'CL', 'CO']]],
+    move: { from: 'Leinfelden', to: 'Wernau', year: '2024', hidden: true,
+            line: 'Eighteen kilometres, and a different division. Too short to draw.' }
+  }
+];
+
+/* The four places he has actually lived and worked, from the roadmap's
+   own Location column - the only cities any source dates. */
+var BASES = {
+  Bengaluru:  ['IN', 12.9716, 77.5946],
+  Coimbatore: ['IN', 11.0168, 76.9558],
+  Leinfelden: ['DE', 48.6939, 9.1667],
+  Wernau:     ['DE', 48.6953, 9.4222]
+};
+
+/* Sites from the Global Footprint slide of his introduction deck. That
+   deck names the cities but never dates them, so each one is placed in
+   the chapter where ITS COUNTRY first appears in the roadmap - derived,
+   not hand-assigned, so it cannot fall out of step with the timeline.
+   Istanbul is nudged ~4km inland: at 1:110m the Bosphorus is generalised
+   wide enough that the true coordinate renders in open water. */
+var SITES = [
+  ['Tokyo', 'JP', 35.6895, 139.6917],
+  ['Hangzhou', 'CN', 30.2741, 120.1551],
+  ['Singapore', 'SG', 1.3521, 103.8198],
+  ['Kuala Lumpur', 'MY', 3.1390, 101.6869],
+  ['Bangkok', 'TH', 13.7563, 100.5018],
+  ['Seoul', 'KR', 37.5665, 126.9780],
+  ['Istanbul', 'TR', 41.0200, 28.9300],
+  ['Dubai', 'AE', 25.2048, 55.2708],
+  ['Madrid', 'ES', 40.4168, -3.7038],
+  ['Aveiro', 'PT', 40.6405, -8.6538],
+  ['Miskolc', 'HU', 48.1035, 20.7784],
+  ['Mikulov', 'CZ', 48.8058, 16.6375],
+  ['Warsaw', 'PL', 52.2297, 21.0122],
+  ['Chicago', 'US', 41.8781, -87.6298],
+  ['West Memphis', 'US', 35.1465, -90.1845],
+  ['Greensboro', 'US', 36.0726, -79.7920]
+];
+
+var COUNTRY_NAME = {
+  RU: 'Russia', UA: 'Ukraine', RO: 'Romania', BG: 'Bulgaria', AU: 'Australia',
+  NZ: 'New Zealand', AE: 'United Arab Emirates', MA: 'Morocco', TR: 'Turkey',
+  IN: 'India', JP: 'Japan', CN: 'China', HK: 'Hong Kong', SG: 'Singapore',
+  MY: 'Malaysia', TH: 'Thailand', VN: 'Vietnam', ID: 'Indonesia',
+  PH: 'Philippines', TW: 'Taiwan', KR: 'South Korea', US: 'United States',
+  CA: 'Canada', HU: 'Hungary', CZ: 'Czechia', PL: 'Poland', SK: 'Slovakia',
+  DE: 'Germany', ES: 'Spain', PT: 'Portugal', HR: 'Croatia', RS: 'Serbia',
+  CL: 'Chile', CO: 'Colombia'
+};
+
+/* Real countries, far too small to draw as an outline at 1:110m. A
+   filled disc is the honest rendering for a city-state, and they still
+   count. */
+var MICRO = { SG: [103.82, 1.35], HK: [114.17, 22.32] };
+
+var REGIONS = [
+  { key: 'AP', name: 'Asia Pacific',
+    cc: ['AU', 'NZ', 'IN', 'JP', 'CN', 'HK', 'SG', 'MY', 'TH', 'VN', 'ID', 'PH', 'TW', 'KR'],
+    note: 'Australia and New Zealand first, in 2011, from the Leinfelden desk. Ten more land between 2017 and 2019.' },
+  { key: 'EMEA', name: 'EMEA',
+    cc: ['DE', 'RU', 'UA', 'RO', 'BG', 'TR', 'AE', 'MA', 'ES', 'PT', 'HU', 'CZ', 'PL', 'SK', 'HR', 'RS'],
+    note: 'Where it started in 2010 and where it is now - the 2025 work returns to countries he first saw fifteen years ago.' },
+  { key: 'AMERICAS', name: 'Americas',
+    cc: ['US', 'CA', 'CO', 'CL'],
+    note: 'North America from 2020, South America from 2025.' }
+];
+
+var FOOTPRINT = {
+  title: 'Where the work happened',
+  lede:  null   /* derived - it quotes the country count */
+};
+
+var TODAY = {
+  title:  'What he runs today',
+  lede:   'Process Expert for Order-to-Cash at Bosch Home Comfort, coordinating a '
+        + 'nine-person partner team across the full order-to-cash surface.',
+  panels: [
+    { h: 'Role',  big: 'Process Expert', p: 'Order-to-Cash · HC/BDO1-S2 · Home Comfort Division. Work Stream Lead for O2C projects since May 2025.' },
+    { h: 'Team',  big: '9 associates',   p: 'BGSW contracted partner team, coordinated since June 2025. Interface, prioritisation and hiring.' },
+    { h: 'Scope', big: 'End to end',     p: 'Quotation through billing, claims, returns and foreign trade.' }
+  ],
+  topicsLabel: 'Process topics covered',
+  topics: ['Quotation Management', 'Order Management', 'Pricing',
+           'Billing · Down Payment · eInvoicing', 'Claims Management & Returns',
+           'Multi-Party Business', 'Customer-Individual Procurement', 'Outputs',
+           'Customer EDI', 'Rebate Agreements', 'Approval Framework',
+           'Foreign Trade', 'Interfaces']
+};
+
+/* The two lists his own roadmap gives for the SAP platform, seventeen
+   years apart. Shown side by side and NOT paraphrased, because the
+   argument is in what disappears between them: maintenance and support.
+ */
+var PLATFORM = {
+  title: 'What the job stopped including',
+  lede:  'His roadmap names the SAP platform twice, seventeen years apart. '
+       + 'Nearly the same list both times — with one thing gone.',
+  then:  { year: '2006', head: 'R/3',
+           items: ['Developments', 'Rollouts', 'Process Management', 'Special Projects',
+                   'Maintenance and Support'],
+           dropped: 'Maintenance and Support' },
+  now:   { year: '2023', head: 'S/4',
+           items: ['Continuous developments', 'Process Management', 'Rollouts',
+                   'Special Projects'] },
+  note:  'The keyboard work is the thing that drops off the list.'
+};
+
+var KIT = {
+  head:   'In the toolkit',
+  bLabel: 'Built it',
+  oLabel: 'Owns it',
+  tip:    'blue is what he wrote. green is what he answers for.',
+  title:  'The toolkit',
+  lede:   'Two inks, one career. The blue was earned at the keyboard; the green is what '
+        + 'he became accountable for once he stepped away from it.'
+};
+
+var PERSON = {
+  title: 'Off the clock',
+  /* Three separate disclosures, three separate switches. */
+  showBirthday: true,
+  showHomeAddress: true,
+  showFamily: true,
+  items: [
+    { b: 'Lives in', s: 'Esslingen-Zell, Germany', key: 'homeAddress' },
+    { b: 'Family',   s: 'Married, two daughters', key: 'family' },
+    { b: 'Born',     s: '23.11.1985', key: 'birthday' },
+    { b: 'Studied',  s: 'Computer Science & Engineering' },
+    { b: 'Enjoys',   s: 'Cooking · Walking · TV shows' }
+  ]
+};
+
+var CLOSING = {
+  line:  'Wernau. He knows what he is asking for — he used to be the one being asked.',
+  note:  null,   /* derived - it quotes the before/after split */
+  contact: [],
+  legend: {
+    b: 'blue — built it',
+    o: 'green — owns it',
+    s: 'red — a site he worked at',
+    p: 'pencil — where he was living'
+  }
+};
+
+/* Natural Earth geometry, baked in by build.mjs. Public domain.
+   See tools/make-map.mjs. */
+var WORLD = {{MAP_JSON}};
+
+/* ============================================================
+   2. HELPERS
+   ============================================================ */
+var SVGNS = 'http://www.w3.org/2000/svg';
+var r1 = function (n) { return Math.round(n * 10) / 10; };
+var $ = function (id) { return document.getElementById(id); };
+var esc = function (s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+};
+var el = function (tag, attrs, parent) {
+  var n = document.createElementNS(SVGNS, tag);
+  for (var k in attrs) if (attrs[k] != null) n.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(n);
+  return n;
+};
+
+var REDUCED = window.matchMedia
+  && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* Natural Earth 1, re-implemented so city lat/lon in the data above can
+   be projected at runtime with exactly the numbers tools/make-map.mjs
+   fitted the country paths with. Keeping the coordinates as coordinates
+   is what makes CITIES editable by hand. */
+function project(lon, lat) {
+  var l = lon * Math.PI / 180, p = lat * Math.PI / 180;
+  var p2 = p * p, p4 = p2 * p2;
+  var x = l * (0.8707 - 0.131979 * p2 + p4 * (-0.013791 + p4 * (0.003971 * p2 - 0.001529 * p4)));
+  var y = p * (1.007226 + p2 * (0.015085 + p4 * (-0.044475 + 0.028874 * p2 - 0.005916 * p4)));
+  return [WORLD.scale * x + WORLD.tx, WORLD.ty - WORLD.scale * y];
+}
+
+/* ============================================================
+   3. DERIVED TOTALS.  Nothing below is typed twice.
+   ============================================================ */
+var HINGE = (function () {
+  for (var i = 0; i < CHAPTERS.length; i++) if (CHAPTERS[i].hinge) return i;
+  return -1;
+})();
+
+var ALL_CC = (function () {
+  var seen = {}, out = [];
+  CHAPTERS.forEach(function (c) {
+    c.countries.forEach(function (cc) { if (!seen[cc]) { seen[cc] = 1; out.push(cc); } });
+  });
+  return out;
+})();
+
+/* first chapter index at which each supported country lights up */
+var CC_FIRST = (function () {
+  var m = {};
+  CHAPTERS.forEach(function (c, i) {
+    c.countries.forEach(function (cc) { if (m[cc] == null) m[cc] = i; });
+  });
+  return m;
+})();
+
+/* first chapter he is BASED in each country - a separate layer, because
+   the roadmap's country column is about projects, not residence */
+var BASE_FIRST = (function () {
+  var m = {};
+  CHAPTERS.forEach(function (c, i) {
+    (c.base || []).forEach(function (cc) { if (m[cc] == null) m[cc] = i; });
+  });
+  return m;
+})();
+
+/* the split the cover and the closing both quote */
+var BEFORE = ALL_CC.filter(function (cc) { return CC_FIRST[cc] < HINGE; }).length;
+var AFTER = ALL_CC.length - BEFORE;
+
+var YEARS_AT = (function () {
+  var m = (AS_OF.year - JOINED.year) * 12 + (AS_OF.month - JOINED.month);
+  return Math.floor(m / 12);
+})();
+
+var N_ENTITIES = (function () {
+  var s = {}; CHAPTERS.forEach(function (c) { s[c.entity] = 1; }); return Object.keys(s).length;
+})();
+
+var BASE_ORDER = (function () {
+  var seen = {}, out = [];
+  CHAPTERS.forEach(function (c) {
+    if (!c.move) return;
+    [c.move.from, c.move.to].forEach(function (n) { if (!seen[n]) { seen[n] = 1; out.push(n); } });
+  });
+  return out;
+})();
+
+/* which chapter each footprint site belongs to: the one where its
+   COUNTRY first appears. Derived, so a site can never sit in a chapter
+   before the country it is in has been reached. */
+var SITE_CHAPTER = function (cc) { return CC_FIRST[cc]; };
+
+var ccName = function (cc) { return COUNTRY_NAME[cc] || cc; };
+
+/* derived copy - these quote counts, so they are built, not typed */
+/* The two tenure figures and the eyebrow all hang off AS_OF, so bumping that
+   one constant moves every one of them together. Both round DOWN: the owning
+   side is nine years nine months, and rounding it up would inflate exactly the
+   half of his career this page argues for. */
+var WORDS = ['no', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight',
+             'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen',
+             'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen', 'Twenty'];
+var wordFor = function (n) { return WORDS[n] || String(n); };
+var monthsBetween = function (a, b) {
+  return (b.year - a.year) * 12 + (b.month - a.month);
+};
+var BUILD_YRS = Math.floor(monthsBetween(JOINED, CROSSED) / 12);
+var OWN_YRS = Math.floor(monthsBetween(CROSSED, AS_OF) / 12);
+
+COVER.eyebrow = wordFor(YEARS_AT) + ' years at Bosch, on both sides of it';
+COVER.thesis = [wordFor(BUILD_YRS) + ' years building the system.',
+                wordFor(OWN_YRS) + ' years answering for it.'];
+COVER.note = 'A country inks in the year his roadmap first records a project there. '
+  + BEFORE + ' arrive while he is still building; ' + AFTER + ' after he stops.';
+FOOTPRINT.lede = ALL_CC.length + ' countries across three regions, worked from four home towns '
+  + '— Bengaluru and Coimbatore first, then Leinfelden and Wernau.';
+CLOSING.note = BEFORE + ' of the ' + ALL_CC.length + ' countries arrived while he was still on the '
+  + 'build side. The other ' + AFTER + ' came after. Pencil is where he was living; '
+  + 'blue is where the work went.';
+
+/* ============================================================
+   4. HEAD, COVER
+   ============================================================ */
+$('tbRole').textContent = COVER.role;
+$('tbName').textContent = COVER.name;
+$('tbFirm').innerHTML = '<b>' + esc(COVER.firm) + '</b><span>' + esc(COVER.firmRole) + '</span>';
+$('avatarSlot').innerHTML = '<div class="avatar-fb">' + esc(COVER.initials) + '</div>';
+
+$('cvEyebrow').textContent = COVER.eyebrow;
+$('cvName').textContent = COVER.name;
+$('cvSub').textContent = COVER.sub;
+$('cvThesis').innerHTML = esc(COVER.thesis[0]) + '<br><span class="flip">'
+  + esc(COVER.thesis[1]) + '</span>';
+$('cvNote').textContent = COVER.note;
+$('cueText').textContent = COVER.cue;
+
+var DERIVED = {
+  years: YEARS_AT + '+',
+  countries: String(ALL_CC.length),
+  entities: String(N_ENTITIES),
+  bases: String(BASE_ORDER.length)
+};
+$('tiles').innerHTML = TILES.map(function (t) {
+  var n = t.derive ? DERIVED[t.derive] : t.n;
+  return '<div class="tile"><b>' + esc(n) + '</b><span>' + esc(t.label) + '</span></div>';
+}).join('');
+
+/* ============================================================
+   5. THE MAP
+   ============================================================ */
+var svg = $('map');
+svg.setAttribute('viewBox', '0 0 ' + WORLD.w + ' ' + WORLD.h);
+
+var gGrat  = el('g', { 'aria-hidden': 'true' }, svg);
+var gLand  = el('g', null, svg);
+var gTrace = el('g', { 'aria-hidden': 'true' }, svg);
+var gMicro = el('g', { 'aria-hidden': 'true' }, svg);
+var gArcs  = el('g', { 'aria-hidden': 'true' }, svg);
+var gPins  = el('g', null, svg);
+
+el('path', { d: WORLD.graticule, 'class': 'graticule' }, gGrat);
+
+var LAND = {};
+WORLD.countries.forEach(function (c) {
+  var p = el('path', { d: c.d, 'class': 'c-land' }, gLand);
+  if (c.n) { var t = el('title', null, p); t.textContent = c.n; }
+  if (c.a2 && (CC_FIRST[c.a2] != null || BASE_FIRST[c.a2] != null)) {
+    var tr = el('path', { d: c.d, 'class': 'c-trace' }, gTrace);
+    LAND[c.a2] = { fill: p, trace: tr };
+  }
+});
+
+var MICRO_N = {};
+Object.keys(MICRO).forEach(function (cc) {
+  if (CC_FIRST[cc] == null) return;
+  var xy = project(MICRO[cc][0], MICRO[cc][1]);
+  MICRO_N[cc] = el('circle', { cx: xy[0], cy: xy[1], r: 3.2, 'class': 'micro' }, gMicro);
+});
+
+/* ---- relocation arcs between home towns ----
+   A quadratic bow, always arcing upward so two arcs over the same pair
+   of towns (he went out and came back) do not lie on top of each other -
+   the return leg is drawn with a shorter bow. */
+var ARCS = [], ARC_SEQ = {};
+CHAPTERS.forEach(function (ch, ci) {
+  var mv = ch.move;
+  if (!mv || mv.hidden) return;
+  var a = BASES[mv.from], b = BASES[mv.to];
+  if (!a || !b) return;
+  var p0 = project(a[2], a[1]), p1 = project(b[2], b[1]);
+  var dx = p1[0] - p0[0], dy = p1[1] - p0[1];
+  var len = Math.sqrt(dx * dx + dy * dy) || 1;
+  var nx = -dy / len, ny = dx / len;
+  if (ny > 0) { nx = -nx; ny = -ny; }          /* normalise to "upward" */
+  /* He crossed Coimbatore-Leinfelden three times: out, back, out again.
+     Drawn with one bow they land exactly on top of each other and read as
+     a single trip. Return legs bow the other way, and each further arc
+     over the same pair opens wider, so all three stay legible. */
+  var key = [mv.from, mv.to].sort().join('>');
+  ARC_SEQ[key] = (ARC_SEQ[key] || 0) + 1;
+  var seq = ARC_SEQ[key] - 1;
+  var bow = (len * (0.17 + 0.11 * seq) + 7) * (mv.back ? -1 : 1);
+  var cx = (p0[0] + p1[0]) / 2 + nx * bow;
+  var cy = (p0[1] + p1[1]) / 2 + ny * bow;
+  var d = 'M' + r1(p0[0]) + ',' + r1(p0[1]) + ' Q' + r1(cx) + ',' + r1(cy)
+        + ' ' + r1(p1[0]) + ',' + r1(p1[1]);
+  var path = el('path', { d: d, 'class': 'arc' }, gArcs);
+  ARCS.push({ node: path, chapter: ci });
+});
+
+/* ---- home-town pins: square, ink, distinct from the round red sites ---- */
+var BASE_PINS = [];
+(function () {
+  var firstSeen = {};
+  CHAPTERS.forEach(function (ch, ci) {
+    var names = [];
+    if (ch.move && !ch.move.hidden) { names.push(ch.move.from); names.push(ch.move.to); }
+    else if (ch.move) names.push(ch.move.to);
+    if (!names.length && ci === 0) names.push('Bengaluru');
+    /* A move too short to draw is also too short to earn a second square:
+       Leinfelden to Wernau is 18 km, 0.63 map units, against a 6.2-unit box.
+       Rename the pin already there instead of stacking another on top. */
+    if (ch.move && ch.move.hidden && firstSeen[ch.move.to] == null) {
+      var host = null;
+      BASE_PINS.forEach(function (q) { if (q.name === ch.move.from) host = q; });
+      if (host) {
+        host.rename = { chapter: ci, before: host.name, after: ch.move.to };
+        firstSeen[ch.move.to] = ci;
+        return;
+      }
+    }
+    names.forEach(function (n) {
+      if (firstSeen[n] != null) return;
+      firstSeen[n] = ci;
+      var b = BASES[n];
+      if (!b) return;
+      var xy = project(b[2], b[1]);
+      var g = el('g', { 'class': 'pin base' }, gPins);
+      el('rect', { x: xy[0] - 3.1, y: xy[1] - 3.1, width: 6.2, height: 6.2, 'class': 'base-box' }, g);
+      var lbl = el('text', { 'class': 'pin-label base-label' }, g);
+      lbl.textContent = n;
+      BASE_PINS.push({ node: g, label: lbl, chapter: ci, x: xy[0], y: xy[1],
+                       base: true, name: n });
+    });
+  });
+})();
+
+/* ---- site pins, placed in the chapter their country first appears ---- */
+var SITE_PINS = [];
+SITES.forEach(function (s) {
+  var ci = SITE_CHAPTER(s[1]);
+  if (ci == null) return;
+  var xy = project(s[3], s[2]);
+  var g = el('g', { 'class': 'pin' }, gPins);
+  el('circle', { cx: xy[0], cy: xy[1], r: 5.4, 'class': 'pin-ring' }, g);
+  el('circle', { cx: xy[0], cy: xy[1], r: 2.2, 'class': 'pin-dot' }, g);
+  var lbl = el('text', { 'class': 'pin-label' }, g);
+  lbl.textContent = s[0];
+  SITE_PINS.push({ node: g, label: lbl, chapter: ci, x: xy[0], y: xy[1] });
+});
+
+var PINS = BASE_PINS.concat(SITE_PINS);
+
+/* ---- label collision ----
+   Europe puts Leinfelden, Wernau, Mikulov, Warsaw and Istanbul within a
+   few map units of each other; drawn naively they overprint into things
+   like "Aveirodrid". Try four positions around each pin, measuring the
+   real rendered box, and drop any label that still collides. Home towns
+   are placed FIRST so they always win a slot - they are the ones the
+   story names out loud. Every dropped label is still listed in full
+   under "Where the work happened". */
+function placeLabels() {
+  /* Seeded with every pin MARKER, not just the labels already placed: a label
+     printed straight through another city's dot ("Leinfelden" over Mikulov,
+     "West Memphis" over Greensboro) is as unreadable as two overlapping labels. */
+  var kept = PINS.map(function (q) {
+    return { x: q.x - 6, y: q.y - 6, width: 12, height: 12 };
+  });
+  var PAD = 2;
+  var hits = function (a, b) {
+    return !(a.x + a.width + PAD < b.x || b.x + b.width + PAD < a.x
+          || a.y + a.height + PAD < b.y || b.y + b.height + PAD < a.y);
+  };
+  var SLOTS = [
+    { dx:  9, dy:  4, anchor: 'start'  },
+    { dx: -9, dy:  4, anchor: 'end'    },
+    { dx:  0, dy: -8, anchor: 'middle' },
+    { dx:  0, dy: 15, anchor: 'middle' }
+  ];
+  /* Home towns get four further, wider placements. Stuttgart sits in the
+     densest corner of the map - Mikulov, Miskolc, Warsaw and Wernau inside
+     fifteen units - and with only the four tight slots the one pin the story
+     actually names lost its label to a city he merely visited. */
+  /* Vertically aligned only. A horizontal fallback put "Wernau" 21 units west
+     of its own square, level with the Madrid dot, where it read as Madrid's
+     label - an unattached caption is worse than no caption. Directly above or
+     below the marker, the pairing stays unambiguous at any distance. */
+  var FAR = [
+    { dx: 0, dy: -19, anchor: 'middle' },
+    { dx: 0, dy:  26, anchor: 'middle' },
+    { dx: 0, dy: -30, anchor: 'middle' },
+    { dx: 0, dy:  37, anchor: 'middle' }
+  ];
+  PINS.forEach(function (p) {
+    p.label.removeAttribute('display');   /* idempotent: this re-runs on resize */
+    var placed = false;
+    var slots = p.base ? SLOTS.concat(FAR) : SLOTS;
+    for (var i = 0; i < slots.length && !placed; i++) {
+      var s = slots[i];
+      p.label.setAttribute('x', p.x + s.dx);
+      p.label.setAttribute('y', p.y + s.dy);
+      p.label.setAttribute('text-anchor', s.anchor);
+      var box;
+      /* break, never return: `return` exited the whole forEach callback, so a
+         label that could not be measured skipped the hide below and stayed
+         parked at slot 0 with no collision filtering at all. */
+      try { box = p.label.getBBox(); } catch (e) { break; }
+      if (!box || !box.width) break;
+      if (box.x < 0 || box.x + box.width > WORLD.w) continue;
+      if (kept.some(function (k) { return hits(box, k); })) continue;
+      kept.push(box);
+      placed = true;
+    }
+    if (!placed) { p.label.setAttribute('display', 'none'); p.labelHidden = true; }
+  });
+}
+
+placeLabels();
+
+/* Labels are display:none below 1080px, where getBBox measures nothing. Without
+   re-running, a phone rotated to landscape - or any window dragged wider - kept
+   every label parked on its neighbour for the rest of the session. */
+if (window.matchMedia) {
+  var wideMQ = window.matchMedia('(min-width: 1081px)');
+  var onWide = function () { if (wideMQ.matches) placeLabels(); };
+  if (wideMQ.addEventListener) wideMQ.addEventListener('change', onWide);
+  else if (wideMQ.addListener) wideMQ.addListener(onWide);
+}
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(function () { placeLabels(); });
+}
+
+/* ============================================================
+   6. THE CHAPTER CARDS
+   ============================================================ */
+$('steps').innerHTML = CHAPTERS.map(function (c, i) {
+  var nb = c.learns.filter(function (L) { return L[1] === 'build'; }).length;
+  var no = c.learns.length - nb;
+  var pb = c.learns.length ? Math.round(nb / c.learns.length * 100) : 0;
+  var ownEra = i >= HINGE;
+
+  var acts = c.acts.map(function (a) { return '<li>' + esc(a) + '</li>'; }).join('');
+  var chips = c.learns.map(function (L) {
+    return '<span class="chip ' + L[1] + '">' + esc(L[0]) + '</span>';
+  }).join('');
+
+  var mix = c.learns.length
+    ? '<div class="mix"><i class="mb" style="width:' + pb + '%"></i>'
+      + '<i class="mo" style="width:' + (100 - pb) + '%"></i></div>'
+      + '<div class="mix-key">'
+      + (nb ? '<i class="kb">' + nb + ' built</i>' : '')
+      + (no ? '<i class="ko">' + no + ' owned</i>' : '')
+      + '</div>'
+    : '';
+
+  /* the dated deliverables off his own 2016 roadmap deck */
+  var ms = c.milestones.length
+    ? '<p class="shipped"><b>Shipped</b>' + c.milestones.map(function (m) {
+        return '<span class="ship">' + esc(m[0]) + ' <em>' + esc(m[1]) + '</em></span>';
+      }).join('') + '</p>'
+    : '';
+
+  /* the year-by-year go-live lines, verbatim from the roadmap */
+  var yrs = (c.years || []).length
+    ? '<ul class="yearlines">' + c.years.map(function (y) {
+        return '<li><b>' + esc(y[0]) + '</b><span>'
+          + y[1].map(ccName).map(esc).join(' · ') + '</span></li>';
+      }).join('') + '</ul>'
+    : '';
+
+  var newCc = c.countries.filter(function (cc) { return CC_FIRST[cc] === i; });
+  var where = newCc.length
+    ? '<p class="c-where"><b>+' + newCc.length + ' new</b> · running total '
+      + ALL_CC.filter(function (cc) { return CC_FIRST[cc] <= i; }).length + '</p>'
+    : '';
+
+  var mv = c.move
+    ? '<p class="c-move">' + esc(c.move.from) + ' → ' + esc(c.move.to)
+      + ' <em>' + esc(c.move.year) + '</em><br>' + esc(c.move.line) + '</p>'
+    : '';
+
+  return '<div class="step"><article class="card' + (ownEra ? ' own-era' : '')
+    + (c.hinge ? ' hinge' : '') + '" data-step="' + i + '">'
+    + '<div class="c-head"><p class="c-years">' + esc(c.display) + '</p>'
+    + '<span class="entity">' + esc(c.entity) + '</span></div>'
+    + '<h2 class="c-title">' + esc(c.title) + '</h2>'
+    + '<p class="c-role">' + esc(c.role) + '</p>'
+    + '<p class="c-org">' + esc(c.org) + '</p>'
+    + mix
+    + '<ul class="c-acts">' + acts + '</ul>'
+    + (chips ? '<div class="chips">' + chips + '</div>' : '')
+    + ms + yrs + where + mv
+    + '</article></div>';
+}).join('');
+
+/* ============================================================
+   7. THE TOOLKIT
+   ============================================================ */
+$('tkHead').textContent = KIT.head;
+$('tkLabelB').textContent = KIT.bLabel;
+$('tkLabelO').textContent = KIT.oLabel;
+$('tkTip').textContent = KIT.tip;
+
+var tkB = $('tkListB'), tkO = $('tkListO');
+var kitSeen = {}, kitCount = { build: 0, own: 0 };
+
+function addToKit(ch) {
+  ch.learns.forEach(function (L) {
+    if (kitSeen[L[0]]) return;
+    kitSeen[L[0]] = 1;
+    kitCount[L[1]]++;
+    var li = document.createElement('li');
+    li.textContent = L[0];
+    var host = L[1] === 'build' ? tkB : tkO;
+    host.appendChild(li);
+    host.parentNode.classList.remove('empty');
+    requestAnimationFrame(function () { li.classList.add('in'); });
+  });
+  var tot = kitCount.build + kitCount.own || 1;
+  $('tkBarB').style.width = (kitCount.build / tot * 100) + '%';
+  $('tkBarO').style.width = (kitCount.own / tot * 100) + '%';
+}
+
+$('kitTitle').textContent = KIT.title;
+$('kitLede').textContent = KIT.lede;
+$('kitBLabel').textContent = KIT.bLabel;
+$('kitOLabel').textContent = KIT.oLabel;
+(function () {
+  var b = [], o = [], seen = {};
+  CHAPTERS.forEach(function (c) {
+    c.learns.forEach(function (L) {
+      if (seen[L[0]]) return;
+      seen[L[0]] = 1;
+      (L[1] === 'build' ? b : o).push('<span class="chip ' + L[1] + '">' + esc(L[0]) + '</span>');
+    });
+  });
+  $('kitBChips').innerHTML = b.join('');
+  $('kitOChips').innerHTML = o.join('');
+})();
+
+/* ============================================================
+   8. SECTIONS AFTER THE MAP
+   ============================================================ */
+$('fpTitle').textContent = FOOTPRINT.title;
+$('fpLede').textContent = FOOTPRINT.lede;
+
+var SITES_BY_CC = (function () {
+  var m = {};
+  SITES.forEach(function (s) { (m[s[1]] = m[s[1]] || []).push(s[0]); });
+  Object.keys(BASES).forEach(function (n) {
+    var cc = BASES[n][0];
+    (m[cc] = m[cc] || []).push(n + ' ⌂');
+  });
+  return m;
+})();
+
+$('fpGrid').innerHTML = REGIONS.map(function (r) {
+  var mine = r.cc.filter(function (cc) { return CC_FIRST[cc] != null; });
+  var cities = [];
+  mine.forEach(function (cc) {
+    (SITES_BY_CC[cc] || []).forEach(function (n) { cities.push(n + ', ' + cc); });
+  });
+  return '<div class="panel"><h3>' + esc(r.name) + '</h3>'
+    + '<div class="big">' + mine.length + ' countries</div>'
+    + '<p>' + esc(r.note) + '</p>'
+    + '<p class="cc-list">' + mine.map(function (cc) {
+        return '<span title="' + esc(ccName(cc)) + '">' + esc(cc) + '</span>';
+      }).join('  ·  ') + '</p>'
+    + (cities.length
+        ? '<p class="cc-cities"><b>On site:</b> ' + esc(cities.join(' · ')) + '</p>'
+        : '')
+    + '</div>';
+}).join('');
+
+/* the R/3 and S/4 lists, side by side */
+$('pfTitle').textContent = PLATFORM.title;
+$('pfLede').textContent = PLATFORM.lede;
+$('pfGrid').innerHTML = [PLATFORM.then, PLATFORM.now].map(function (side, k) {
+  return '<div class="panel pf' + (k ? ' pf-now' : '') + '"><h3>' + esc(side.year) + '</h3>'
+    + '<div class="big">' + esc(side.head) + '</div><ul class="pf-list">'
+    + side.items.map(function (it) {
+        return '<li' + (it === side.dropped ? ' class="gone"' : '') + '>' + esc(it) + '</li>';
+      }).join('')
+    + '</ul></div>';
+}).join('');
+$('pfNote').textContent = PLATFORM.note;
+
+$('tdTitle').textContent = TODAY.title;
+$('tdLede').textContent = TODAY.lede;
+$('tdGrid').innerHTML = TODAY.panels.map(function (p) {
+  return '<div class="panel"><h3>' + esc(p.h) + '</h3><div class="big">' + esc(p.big)
+    + '</div><p>' + esc(p.p) + '</p></div>';
+}).join('');
+$('tdTopicsLbl').textContent = TODAY.topicsLabel;
+$('tdTopics').innerHTML = TODAY.topics.map(function (t) {
+  return '<span class="topic">' + esc(t) + '</span>';
+}).join('');
+
+$('pTitle').textContent = PERSON.title;
+$('pGrid').innerHTML = PERSON.items.filter(function (it) {
+  if (it.key === 'birthday') return PERSON.showBirthday;
+  if (it.key === 'homeAddress') return PERSON.showHomeAddress;
+  if (it.key === 'family') return PERSON.showFamily;
+  return true;
+}).map(function (it) {
+  return '<div class="p-item"><b>' + esc(it.b) + '</b><span>' + esc(it.s) + '</span></div>';
+}).join('');
+
+$('clLine').textContent = CLOSING.line;
+$('clNote').textContent = CLOSING.note;
+$('clContact').innerHTML = CLOSING.contact.map(function (c) {
+  return '<a href="' + esc(c.href) + '">' + esc(c.text) + '</a>';
+}).join('');
+$('lgB').textContent = CLOSING.legend.b;
+$('lgO').textContent = CLOSING.legend.o;
+$('lgS').textContent = CLOSING.legend.s;
+$('lgP').textContent = CLOSING.legend.p;
+
+/* ============================================================
+   9. SCROLL - what is lit at any moment
+   ============================================================ */
+var reached = -1;
+var gaugeNum = $('gaugeNum'), gaugeEra = $('gaugeEra'), toolkit = $('toolkit');
+
+function litCount(upto) {
+  var n = 0;
+  ALL_CC.forEach(function (cc) { if (CC_FIRST[cc] <= upto) n++; });
+  return n;
+}
+
+var gaugeShown = 0, gaugeTimer = null;
+function setGauge(target) {
+  if (REDUCED) { gaugeShown = target; gaugeNum.textContent = target; return; }
+  clearInterval(gaugeTimer);
+  gaugeTimer = setInterval(function () {
+    if (gaugeShown === target) { clearInterval(gaugeTimer); return; }
+    gaugeShown += gaugeShown < target ? 1 : -1;
+    gaugeNum.textContent = gaugeShown;
+  }, 34);
+}
+
+function advanceTo(i) {
+  if (i === reached) return;
+  var forward = i > reached;
+  reached = i;
+
+  /* project countries - blue */
+  ALL_CC.forEach(function (cc) {
+    var L = LAND[cc];
+    var on = CC_FIRST[cc] <= i;
+    if (L) { L.fill.classList.toggle('lit', on); L.trace.classList.toggle('on', on); }
+    if (MICRO_N[cc]) MICRO_N[cc].classList.toggle('on', on);
+  });
+
+  /* home countries - pencil. A separate layer on purpose: the roadmap's
+     country column records projects, not where he lived. */
+  Object.keys(BASE_FIRST).forEach(function (cc) {
+    var L = LAND[cc];
+    if (L) L.fill.classList.toggle('home', BASE_FIRST[cc] <= i);
+  });
+
+  PINS.forEach(function (p) {
+    p.node.classList.toggle('on', p.chapter <= i);
+    /* the one base that changes its name partway through the story */
+    if (p.rename) {
+      p.label.textContent = i >= p.rename.chapter ? p.rename.after : p.rename.before;
+    }
+  });
+  ARCS.forEach(function (a) { a.node.classList.toggle('on', a.chapter <= i); });
+
+  setGauge(litCount(i));
+  gaugeEra.textContent = i >= 0 ? CHAPTERS[i].display : '';
+
+  /* Going backwards the kit has to unwind too. It used to be append-only, so
+     scrolling back to re-read chapter 1 showed 2006 carrying S/4HANA and
+     Hiring - inverting the one story the toolkit exists to tell. Rebuilt only
+     on the backward path, so the forward entrance animation is untouched. */
+  if (!forward) {
+    kitSeen = {}; kitCount = { build: 0, own: 0 };
+    tkB.innerHTML = ''; tkO.innerHTML = '';
+    tkB.parentNode.classList.add('empty');
+    tkO.parentNode.classList.add('empty');
+    $('tkBarB').style.width = '0%';
+    $('tkBarO').style.width = '0%';
+  }
+  for (var k = 0; k <= i; k++) addToKit(CHAPTERS[k]);
+}
+
+var atlasEl = document.getElementById('atlas');
+function syncToolkit() {
+  var r = atlasEl.getBoundingClientRect();
+  /* 0.55 let the card hang on far enough to clip the first heading below the
+     atlas; it has to be gone before that heading scrolls into view. */
+  var onStage = reached >= 0 && r.bottom > window.innerHeight * 0.98 && r.top < window.innerHeight;
+  toolkit.classList.toggle('show', onStage);
+}
+
+var cards = [].slice.call(document.querySelectorAll('.card[data-step]'));
+
+var io = new IntersectionObserver(function (entries) {
+  entries.forEach(function (e) { if (e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold: 0.15 });
+cards.forEach(function (c) { io.observe(c); });
+
+var ticking = false;
+function onScroll() {
+  if (ticking) return;
+  ticking = true;
+  requestAnimationFrame(function () {
+    ticking = false;
+    var mid = window.innerHeight / 2;
+    var cur = -1;
+    for (var i = 0; i < cards.length; i++) {
+      if (cards[i].getBoundingClientRect().top < mid + 80) cur = i;
+    }
+    advanceTo(cur);
+    syncToolkit();
+  });
+}
+
+window.addEventListener('scroll', onScroll, { passive: true });
+window.addEventListener('resize', onScroll, { passive: true });
+onScroll();
+
+})();
+
+</script>

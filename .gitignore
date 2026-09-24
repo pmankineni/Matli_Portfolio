@@ -1,0 +1,9 @@
+node_modules/
+docs/
+
+# Source material: his own documents. Local only, never published -
+# a GitHub Pages repo serves every committed file at a public URL.
+source/
+
+.DS_Store
+*.log

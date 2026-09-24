@@ -1,0 +1,9 @@
+# One line ending, everywhere. The build splits <head>/<body> on a regex
+# now, but a CRLF template silently defeated the original string match and
+# shipped a document with no <body> at all.
+* text=auto eol=lf
+*.woff2 binary
+*.webp binary
+*.png binary
+*.pptx binary
+*.xlsx binary
